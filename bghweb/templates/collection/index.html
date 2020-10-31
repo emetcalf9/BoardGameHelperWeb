@@ -4,17 +4,14 @@
   <h1>{% block title %}Your Collection{% endblock %}</h1>
   {% if g.user %}
     <a class="action" href="{{ url_for('collection.addgame') }}">Add a Game</a>
+    <a class="action" href="{{ url_for('collection.pickgame') }}">Pick a Game to Play</a>
   {% endif %}
 {% endblock %}
 
 {% block content %}
   {% for game in games %}
     <article class="game">
-      <header>
-        <div>
-          <h1>{{ game['name'] }}</h1>
-        </div>
-      </header>
+      <p>{{ game['name'] }}</p>
         <ul>
             <li>Times Played: {{ game['times_played'] }}</li>
         </ul>

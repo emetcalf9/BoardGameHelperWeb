@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}You go first!{% endblock %}</h1>
+  {% if g.user %}
+    <a class="action" href="{{ url_for('collection.pickplayer') }}">Pick again</a>
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+    <article class="game">
+      <p>{{ name }} gets to go first!</p>
+    </article>
+{% endblock %}

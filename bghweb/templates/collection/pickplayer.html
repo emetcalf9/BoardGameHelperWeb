@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}Who goes first?{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+  <form method="post">
+    <label for="playerlist">Enter each player's name on a separate line</label>
+    <textarea name="playerlist" id="playerlist" required></textarea>
+    <input type="submit" value="Pick someone!">
+  </form>
+{% endblock %}

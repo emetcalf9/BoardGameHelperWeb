@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}Play a Game{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+  <form method="post">
+    <label for="numplayers">How many people are playing?</label>
+    <input name="numplayers" id="numplayers" required>
+    <input type="submit" value="Pick a game for me!">
+  </form>
+{% endblock %}

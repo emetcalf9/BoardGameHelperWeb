@@ -2,6 +2,7 @@ from flask import (
     Blueprint, flash, g, redirect, render_template, request, url_for, session
 )
 from werkzeug.exceptions import abort
+import random
 
 from bghweb.auth import login_required
 from bghweb.db import get_db
@@ -10,6 +11,7 @@ bp = Blueprint('collection', __name__)
 
 
 @bp.route('/')
+@login_required
 def index():
     db = get_db()
     games = db.execute(
@@ -20,7 +22,7 @@ def index():
     return render_template('collection/index.html', games=games)
 
 
-@bp.route('/addgame')
+@bp.route('/addgame', methods=('GET', 'POST'))
 @login_required
 def addgame():
     if request.method == 'POST':
@@ -33,25 +35,74 @@ def addgame():
             error = 'Name is required.'
         elif not minplay:
             error = 'Minimum Players is required.'
-        if not maxplay:
+        elif not maxplay:
             error = 'Maximum Players is required.'
 
         if error is None:
             db = get_db()
-            gameexists = db.execute("Select id from game where name like '%?%'", name)
-            if not gameexists:
-                db.execute('INSERT INTO game (name, minplay, maxplay) VALUES (?, ?, ?)', (name, minplay, maxplay))
-                game_id = db.execute('SELECT id from game where name = ?', name)
-                db.execute('INSERT INTO collection (user_id, game_id) VALUES (?, ?)', (session['user_id'], game_id))
+            game_id = db.execute("Select id from games where name = ?", (name,)).fetchone()
+            if not game_id:
+                db.execute('INSERT INTO games (name, minplay, maxplay) VALUES (?, ?, ?)', (name, minplay, maxplay))
+                game_id = db.execute('SELECT id from games where name = ?', (name,)).fetchone()
+                db.execute('INSERT INTO collection (user_id, game_id) VALUES (?, ?)', (session['user_id'], game_id[0]))
                 db.commit()
+                return redirect(url_for('index'))
             else:
-                game_id = db.execute('SELECT id from game where name = ?', name)
-                db.execute('INSERT INTO collection (user_id, game_id) VALUES (?, ?)', (session['user_id'], game_id))
+                game_id = db.execute('SELECT id from games where name = ?', (name,)).fetchone()
+                db.execute('INSERT INTO collection (user_id, game_id) VALUES (?, ?)', (session['user_id'], game_id[0]))
                 db.commit()
+                return redirect(url_for('index'))
+
 
         flash(error)
 
-        return redirect(url_for('index'))
-
     return render_template('collection/addgame.html')
 
+
+@bp.route('/pickgame', methods=('GET', 'POST'))
+@login_required
+def pickgame():
+    if request.method == 'POST':
+        numplayers = request.form['numplayers']
+        error = None
+
+        if not numplayers:
+            error = 'Number of players is required'
+
+        if error is None:
+            db = get_db()
+            options = db.execute(
+                "Select Name from games where ? between minplay and maxplay", (numplayers,)
+            ).fetchall()
+            if not options:
+                error = 'No games support that number of players. Try again'
+                flash(error)
+                return render_template('collection/pickgame.html')
+            options_list = []
+            for game in options:
+                options_list.append(game[0])
+            choice_num = random.randint(0, len(options_list) - 1)
+            return render_template('collection/gameresult.html', game=options_list[choice_num])
+
+        flash(error)
+
+    return render_template('collection/pickgame.html')
+
+
+@bp.route('/pickplayer', methods= ('GET', 'POST'))
+@login_required
+def pickplayer():
+    if request.method == 'POST':
+        playertext = request.form['playerlist']
+        error = None
+
+        if not playertext:
+            error = "You didn't list any players. Try again"
+
+        if error is None:
+            playerlist = playertext.split('\n')
+            first_player_num = random.randint(0, len(playerlist) - 1)
+            return render_template('collection/firstplayer.html', name=playerlist[first_player_num])
+        flash(error)
+
+    return render_template('collection/pickplayer.html')
