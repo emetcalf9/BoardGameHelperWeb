@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask
+from flask import Flask, render_template
 
 
 def create_app(test_config = None):
@@ -31,5 +31,6 @@ def create_app(test_config = None):
 
     from . import collection
     app.register_blueprint(collection.bp)
+    app.add_url_rule('/', endpoint='index')
 
     return app
