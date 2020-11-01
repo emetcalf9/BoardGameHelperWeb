@@ -19,7 +19,9 @@ def index():
         " FROM collection c LEFT OUTER JOIN games g ON c.game_id = g.id"
         " WHERE c.user_id = ?", (session['user_id'],)
     ).fetchall()
-    return render_template('collection/index.html', games=games)
+    players = db.execute("SELECT name, games_played FROM players "
+                         "WHERE user_id = ?", (session['user_id'],))
+    return render_template('collection/index.html', games=games, players=players)
 
 
 @bp.route('/addgame', methods=('GET', 'POST'))
@@ -71,18 +73,18 @@ def pickgame():
         if error is None:
             db = get_db()
             options = db.execute(
-                "Select Name from games where ? between minplay and maxplay", (numplayers,)
+                "Select id, Name from games where ? between minplay and maxplay", (numplayers,)
             ).fetchall()
             if not options:
                 error = 'No games support that number of players. Try again'
                 flash(error)
                 return render_template('collection/pickgame.html')
-            options_list = []
-            for game in options:
-                options_list.append(game[0])
-            # choice_num = random.randint(0, len(options_list) - 1)
+            picked_game = random.randint(0, len(options) -1)
+            db.execute('UPDATE collection SET times_played = times_played + 1 '
+                       'WHERE game_id = ? and user_id = ?', (options[picked_game][0], session['user_id']))
+            db.commit()
             return render_template('collection/gameresult.html',
-                                   game=options_list[random.randint(0, len(options_list) - 1)])
+                                   game=options[picked_game][1])
 
         flash(error)
 
@@ -113,8 +115,8 @@ def pickplayer():
                     db.execute('UPDATE players SET games_played = games_played + 1'
                                ' WHERE id = ?', (player_id))
                     db.commit()
-            first_player_num = random.randint(0, len(playerlist) - 1)
-            return render_template('collection/firstplayer.html', name=playerlist[first_player_num])
+            return render_template('collection/firstplayer.html',
+                                   name=playerlist[random.randint(0, len(playerlist) - 1)])
         flash(error)
 
     return render_template('collection/pickplayer.html')
