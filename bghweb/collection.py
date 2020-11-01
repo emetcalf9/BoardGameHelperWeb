@@ -53,7 +53,6 @@ def addgame():
                 db.commit()
                 return redirect(url_for('index'))
 
-
         flash(error)
 
     return render_template('collection/addgame.html')
@@ -81,15 +80,16 @@ def pickgame():
             options_list = []
             for game in options:
                 options_list.append(game[0])
-            choice_num = random.randint(0, len(options_list) - 1)
-            return render_template('collection/gameresult.html', game=options_list[choice_num])
+            # choice_num = random.randint(0, len(options_list) - 1)
+            return render_template('collection/gameresult.html',
+                                   game=options_list[random.randint(0, len(options_list) - 1)])
 
         flash(error)
 
     return render_template('collection/pickgame.html')
 
 
-@bp.route('/pickplayer', methods= ('GET', 'POST'))
+@bp.route('/pickplayer', methods=('GET', 'POST'))
 @login_required
 def pickplayer():
     if request.method == 'POST':
@@ -100,7 +100,19 @@ def pickplayer():
             error = "You didn't list any players. Try again"
 
         if error is None:
+            db = get_db()
             playerlist = playertext.split()
+            for player in playerlist:
+                player_id = db.execute('SELECT id from players WHERE user_id = ? and upper(name) = upper(?)',
+                                       (session['user_id'], player)).fetchone()
+                if not player_id:
+                    db.execute('INSERT INTO players (user_id, name) VALUES (?, ?)',
+                               (session['user_id'], player))
+                    db.commit()
+                else:
+                    db.execute('UPDATE players SET games_played = games_played + 1'
+                               ' WHERE id = ?', (player_id))
+                    db.commit()
             first_player_num = random.randint(0, len(playerlist) - 1)
             return render_template('collection/firstplayer.html', name=playerlist[first_player_num])
         flash(error)

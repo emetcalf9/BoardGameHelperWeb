@@ -21,6 +21,7 @@ CREATE TABLE players (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER NOT NULL,
     name TEXT NOT NULL,
+    games_played INTEGER DEFAULT 1,
     FOREIGN KEY (user_id) REFERENCES user (id)
 );
 
