@@ -100,7 +100,7 @@ def pickplayer():
             error = "You didn't list any players. Try again"
 
         if error is None:
-            playerlist = playertext.split('\n')
+            playerlist = playertext.split()
             first_player_num = random.randint(0, len(playerlist) - 1)
             return render_template('collection/firstplayer.html', name=playerlist[first_player_num])
         flash(error)
