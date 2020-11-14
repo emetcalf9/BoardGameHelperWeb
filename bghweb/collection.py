@@ -1,7 +1,6 @@
 from flask import (
-    Blueprint, flash, g, redirect, render_template, request, url_for, session
+    Blueprint, flash, redirect, render_template, request, url_for, session
 )
-from werkzeug.exceptions import abort
 import random
 from bghweb.BGGAPI import *
 
@@ -30,7 +29,7 @@ def index():
 def addgame():
     if request.method == 'POST':
         name = request.form['name']
-        favorite = '1' if request.form['favorite'] else '0'
+        favorite = request.form['favorite']
         error = None
 
         if not name:

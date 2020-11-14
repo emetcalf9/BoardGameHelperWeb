@@ -8,7 +8,8 @@
   <form method="post">
     <label for="name">Name</label>
     <input name="name" id="name" required>
-    <div><input type="checkbox" id="favorite" name="favorite" value="1"><label for="favorite"> Favorite?</label></div>
+    <div><input type="checkbox" id="favorite" name="favorite" value="1"><label for="favorite"> Favorite?</label>
+    <input type='hidden' value='0' name='favorite'></div>
     <input type="submit" value="Add Game">
   </form>
 {% endblock %}
