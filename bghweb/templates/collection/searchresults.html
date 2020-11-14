@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}Search Results{% endblock %}</h1>
+  {% if g.user %}
+    <a class="action" href="{{ url_for('collection.addgame') }}">Go back</a>
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+<h1>Which game would you like to add?</h1>
+<form method="post">
+{% for game in game_list %}
+    <label for="{{ game[1] }}">
+     <input type="radio" name ="name" id="{{ game[1] }}" value="{{ game[1] }}"> {{ game[1] }}
+    </label>
+    {% if not loop.last %}
+      <br>
+    {% endif %}
+  {% endfor %}
+    <div><input type="checkbox" id="favorite" name="favorite" value="1">
+        <label for="favorite"> Favorite?</label></div>
+    <input type="submit" value="Submit">
+</form>
+{% endblock %}

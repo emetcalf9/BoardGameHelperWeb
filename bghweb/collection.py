@@ -3,6 +3,7 @@ from flask import (
 )
 from werkzeug.exceptions import abort
 import random
+from bghweb.BGGAPI import *
 
 from bghweb.auth import login_required
 from bghweb.db import get_db
@@ -15,7 +16,7 @@ bp = Blueprint('collection', __name__)
 def index():
     db = get_db()
     games = db.execute(
-        "SELECT g.name, c.times_played"
+        "SELECT g.*, CASE c.favorite WHEN 1 THEN 'Yes' ELSE 'No' END as 'favorite' "
         " FROM collection c LEFT OUTER JOIN games g ON c.game_id = g.id"
         " WHERE c.user_id = ?", (session['user_id'],)
     ).fetchall()
@@ -29,31 +30,30 @@ def index():
 def addgame():
     if request.method == 'POST':
         name = request.form['name']
-        minplay = request.form['minplay']
-        maxplay = request.form['maxplay']
+        favorite = '1' if request.form['favorite'] else '0'
         error = None
 
         if not name:
             error = 'Name is required.'
-        elif not minplay:
-            error = 'Minimum Players is required.'
-        elif not maxplay:
-            error = 'Maximum Players is required.'
 
         if error is None:
-            db = get_db()
-            game_id = db.execute("Select id from games where name = ?", (name,)).fetchone()
-            if not game_id:
-                db.execute('INSERT INTO games (name, minplay, maxplay) VALUES (?, ?, ?)', (name, minplay, maxplay))
-                game_id = db.execute('SELECT id from games where name = ?', (name,)).fetchone()
-                db.execute('INSERT INTO collection (user_id, game_id) VALUES (?, ?)', (session['user_id'], game_id[0]))
+            results = search_games(name)
+            if len(results) == 1:
+                game_id = results[0][0]
+                game_info = get_game_info(game_id)
+                db = get_db()
+                game_exists = db.execute("Select id from games where name = ?", (game_id,)).fetchone()
+                if not game_exists:
+                    db.execute('INSERT INTO games (id, name, minplay, maxplay) VALUES (?, ?, ?, ?)', game_info)
+                    db.commit()
+
+                db.execute('INSERT INTO collection (user_id, game_id, favorite) VALUES (?, ?, ?)',
+                           (session['user_id'], game_id, favorite))
                 db.commit()
+                flash("Added Successfully")
                 return redirect(url_for('index'))
             else:
-                game_id = db.execute('SELECT id from games where name = ?', (name,)).fetchone()
-                db.execute('INSERT INTO collection (user_id, game_id) VALUES (?, ?)', (session['user_id'], game_id[0]))
-                db.commit()
-                return redirect(url_for('index'))
+                return render_template('collection/searchresults.html', game_list=results)
 
         flash(error)
 
@@ -80,9 +80,6 @@ def pickgame():
                 flash(error)
                 return render_template('collection/pickgame.html')
             picked_game = random.randint(0, len(options) -1)
-            db.execute('UPDATE collection SET times_played = times_played + 1 '
-                       'WHERE game_id = ? and user_id = ?', (options[picked_game][0], session['user_id']))
-            db.commit()
             return render_template('collection/gameresult.html',
                                    game=options[picked_game][1])
 
@@ -120,3 +117,12 @@ def pickplayer():
         flash(error)
 
     return render_template('collection/pickplayer.html')
+
+@bp.route('/togglefavorite/<id>', methods=['GET'])
+@login_required
+def togglefavorite(id):
+    db = get_db()
+    db.execute("UPDATE collection set favorite = ((favorite | 1) - (favorite & 1)) where user_id = ? and game_id = ?",
+               (session['user_id'], id))
+    db.commit()
+    return redirect(url_for('index'))

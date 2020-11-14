@@ -11,9 +11,11 @@
   {% for game in games %}
     <article class="game">
       <p>{{ game['name'] }}</p>
-        <ul>
-            <li>Times Played: {{ game['times_played'] }}</li>
-        </ul>
+      <ul>
+        <li>Minimum Players: {{ game['minplay'] }}</li>
+        <li>Maximum Players: {{ game['maxplay'] }}</li>
+        <li>Favorite?: <a class="action" href="{{ url_for('collection.togglefavorite', id=game['id']) }}">{{game['favorite']}}</a> </li>
+      </ul>
     </article>
     {% if not loop.last %}
       <hr>
@@ -24,10 +26,7 @@
 <hr>
   {% for player in players %}
     <article class="player">
-      <p>{{ player['name'] }}</p>
-        <ul>
-            <li>Games Played: {{ player['games_played'] }}</li>
-        </ul>
+      <p>{{ player['name'] }}</
     </article>
     {% if not loop.last %}
       <hr>

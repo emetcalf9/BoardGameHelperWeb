@@ -8,10 +8,7 @@
   <form method="post">
     <label for="name">Name</label>
     <input name="name" id="name" required>
-    <label for="minplay">Minimum number of players?</label>
-    <input name="minplay" id="minplay" required>
-      <label for="maxplay">Maximum number of players?</label>
-    <input name="maxplay" id="maxplay" required>
+    <div><input type="checkbox" id="favorite" name="favorite" value="1"><label for="favorite"> Favorite?</label></div>
     <input type="submit" value="Add Game">
   </form>
 {% endblock %}

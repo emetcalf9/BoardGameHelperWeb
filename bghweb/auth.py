@@ -29,7 +29,7 @@ def register():
             db.execute('INSERT INTO user (username, password) VALUES (?, ?)',
                        (username, generate_password_hash(password)))
             db.commit()
-            return redirect(url_for('auth.login'))
+            return redirect(url_for('index'))
 
         flash(error)
     return render_template('auth/register.html')

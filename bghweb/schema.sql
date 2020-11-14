@@ -11,7 +11,7 @@ CREATE TABLE user (
 );
 
 CREATE TABLE games (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  id INTEGER UNIQUE NOT NULL,
   name TEXT UNIQUE NOT NULL,
   minplay INTEGER NOT NULL,
   maxplay INTEGER NOT NULL
@@ -21,7 +21,7 @@ CREATE TABLE players (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER NOT NULL,
     name TEXT NOT NULL,
-    games_played INTEGER DEFAULT 1,
+    games_played INTEGER DEFAULT 0,
     FOREIGN KEY (user_id) REFERENCES user (id)
 );
 
@@ -29,18 +29,18 @@ CREATE TABLE history (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER NOT NULL,
     game_id INTEGER NOT NULL,
-    winner TEXT,
+    winner_id INTEGER,
     score INTEGER,
     date_played TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES user (id),
-    FOREIGN KEY (game_id) REFERENCES games (id)
+    FOREIGN KEY (game_id) REFERENCES games (id),
+    FOREIGN KEY (winner_id) REFERENCES players (id)
 );
 
 CREATE TABLE collection (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER NOT NULL,
     game_id INTEGER NOT NULL,
-    times_played INTEGER DEFAULT 0,
     favorite INTEGER DEFAULT 0,
     FOREIGN KEY (user_id) REFERENCES user (id),
     FOREIGN KEY (game_id) REFERENCES games (id)
