@@ -8,7 +8,17 @@
 {% endblock %}
 
 {% block content %}
-    <article class="game">
+    <article class="player">
       <p>{{ name }} gets to go first!</p>
     </article>
+    <form method="post">
+    <input type="hidden" name="playerlist" id="playerlist" value="">
+    <input type="submit" value="Pick someone else!">
+  </form>
+    <script>
+        console.log("{{pickagainlist}}")
+        let players = "{{pickagainlist}}".split('_').join('\n');
+        console.log(players);
+        document.getElementById('playerlist').value = players;
+    </script>
 {% endblock %}

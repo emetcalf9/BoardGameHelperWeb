@@ -41,7 +41,7 @@ def addgame():
                 game_id = results[0][0]
                 game_info = get_game_info(game_id)
                 db = get_db()
-                game_exists = db.execute("Select id from games where name = ?", (game_id,)).fetchone()
+                game_exists = db.execute("Select id from games where id = ?", (game_id,)).fetchone()
                 if not game_exists:
                     db.execute('INSERT INTO games (id, name, minplay, maxplay) VALUES (?, ?, ?, ?)', game_info)
                     db.commit()
@@ -107,12 +107,10 @@ def pickplayer():
                     db.execute('INSERT INTO players (user_id, name) VALUES (?, ?)',
                                (session['user_id'], player))
                     db.commit()
-                else:
-                    db.execute('UPDATE players SET games_played = games_played + 1'
-                               ' WHERE id = ?', (player_id))
-                    db.commit()
+            pickagainlist = "_".join(playerlist)
             return render_template('collection/firstplayer.html',
-                                   name=playerlist[random.randint(0, len(playerlist) - 1)])
+                                   name=playerlist[random.randint(0, len(playerlist) - 1)],
+                                   pickagainlist=pickagainlist)
         flash(error)
 
     return render_template('collection/pickplayer.html')

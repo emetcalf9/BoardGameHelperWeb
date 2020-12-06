@@ -20,12 +20,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0782a6c5-5b5a-4f46-9b4d-d5dae2fda4b6" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/BoardGameHelperWeb.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/BoardGameHelperWeb.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bghweb/collection.py" beforeDir="false" afterPath="$PROJECT_DIR$/bghweb/collection.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bghweb/templates/collection/addgame.html" beforeDir="false" afterPath="$PROJECT_DIR$/bghweb/templates/collection/addgame.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bghweb/templates/collection/searchresults.html" beforeDir="false" afterPath="$PROJECT_DIR$/bghweb/templates/collection/searchresults.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bghweb/templates/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/bghweb/templates/base.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bghweb/templates/collection/firstplayer.html" beforeDir="false" afterPath="$PROJECT_DIR$/bghweb/templates/collection/firstplayer.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bghweb/templates/collection/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/bghweb/templates/collection/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bghweb/templates/collection/pickplayer.html" beforeDir="false" afterPath="$PROJECT_DIR$/bghweb/templates/collection/pickplayer.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/instance/bgh.sqlite" beforeDir="false" afterPath="$PROJECT_DIR$/instance/bgh.sqlite" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -107,5 +107,9 @@
     </state>
     <state x="449" y="198" width="1022" height="737" key="SettingsEditor/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1605337703694" />
     <state x="2369" y="175" width="1022" height="737" key="SettingsEditor/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1604188967679" />
+    <state x="2543" y="239" width="672" height="678" key="search.everywhere.popup" timestamp="1607217398078">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state x="2543" y="239" width="672" height="678" key="search.everywhere.popup/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1607217398078" />
   </component>
 </project>

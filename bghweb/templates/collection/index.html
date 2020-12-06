@@ -1,13 +1,17 @@
 {% extends 'base.html' %}
 
 {% block header %}
-  <h1>{% block title %}Your Collection{% endblock %}</h1>
+  <h1>{% block title %}Home Page{% endblock %}</h1>
     <a class="action" href="{{ url_for('collection.addgame') }}">Add a Game</a>
     <a class="action" href="{{ url_for('collection.pickgame') }}">Pick a Game to Play</a>
     <a class="action" href="{{ url_for('collection.pickplayer') }}">Pick a First Player</a>
 {% endblock %}
 
 {% block content %}
+<div class="container">
+  <div class="row">
+  <div class="col-sm">
+    <h1>Your Games</h1>
   {% for game in games %}
     <article class="game">
       <p>{{ game['name'] }}</p>
@@ -21,9 +25,9 @@
       <hr>
     {% endif %}
   {% endfor %}
-<br>
+</div>
+  <div class="col-sm">
 <h1>People you play with</h1>
-<hr>
   {% for player in players %}
     <article class="player">
       <p>{{ player['name'] }}</
@@ -32,4 +36,7 @@
       <hr>
     {% endif %}
   {% endfor %}
+    </div>
+    </div>
+  </div>
 {% endblock %}
