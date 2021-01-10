@@ -16,18 +16,21 @@ def register():
         username = request.form['username']
         password = request.form['password']
         db = get_db()
+        dbcur = db.cursor()
         error = None
 
         if not username:
             error = 'Username is required.'
         elif not password:
             error = 'Password is required.'
-        elif db.execute('SELECT id FROM user WHERE username = ?', (username,)).fetchone() is not None:
-            error = f'User {username} is already registered.'
+        else:
+            dbcur.execute('SELECT id FROM users WHERE username = %s;', (username,))
+            if dbcur.fetchone() is not None:
+                error = f'User {username} is already registered.'
 
         if error is None:
-            db.execute('INSERT INTO user (username, password) VALUES (?, ?)',
-                       (username, generate_password_hash(password)))
+            dbcur.execute('INSERT INTO users (username, password) VALUES (%s, %s);',
+                          (username, generate_password_hash(password)))
             db.commit()
             return redirect(url_for('index'))
 
@@ -41,17 +44,19 @@ def login():
         username = request.form['username']
         password = request.form['password']
         db = get_db()
+        dbcur = db.cursor()
         error = None
-        user = db.execute('SELECT * FROM user WHERE username = ?', (username,)).fetchone()
+        dbcur.execute('SELECT * FROM users WHERE username = %s;', (username,))
+        user = dbcur.fetchone()
 
         if user is None:
             error = 'Incorrect username.'
-        elif not check_password_hash(user['password'], password):
+        elif not check_password_hash(user[2], password):
             error = 'Incorrect password.'
 
         if error is None:
             session.clear()
-            session['user_id'] = user['id']
+            session['user_id'] = user[0]
             return redirect(url_for('index'))
 
         flash(error)
@@ -66,7 +71,9 @@ def load_logged_in_user():
     if user_id is None:
         g.user = None
     else:
-        g.user = get_db().execute('SELECT * FROM user where id = ?', (user_id,)).fetchone()
+        dbcur = get_db().cursor()
+        dbcur.execute('SELECT * FROM users where id = %s;', (user_id,))
+        g.user = dbcur.fetchone()
 
 
 @bp.route('/logout')
@@ -81,4 +88,5 @@ def login_required(view):
         if g.user is None:
             return redirect(url_for('auth.login'))
         return view(**kwargs)
+
     return wrapped_view

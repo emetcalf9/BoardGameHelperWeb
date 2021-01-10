@@ -14,13 +14,16 @@ bp = Blueprint('collection', __name__)
 @login_required
 def index():
     db = get_db()
-    games = db.execute(
-        "SELECT g.*, CASE c.favorite WHEN 1 THEN 'Yes' ELSE 'No' END as 'favorite' "
+    dbcur = db.cursor()
+    dbcur.execute(
+        "SELECT g.*, CASE c.favorite WHEN 1 THEN 'Yes' ELSE 'No' END "
         " FROM collection c LEFT OUTER JOIN games g ON c.game_id = g.id"
-        " WHERE c.user_id = ?", (session['user_id'],)
-    ).fetchall()
-    players = db.execute("SELECT name, games_played FROM players "
-                         "WHERE user_id = ?", (session['user_id'],))
+        " WHERE c.user_id = %s;", (session['user_id'],)
+    )
+    games = dbcur.fetchall()
+    dbcur.execute("SELECT name, games_played FROM players "
+                            "WHERE user_id = %s;", (session['user_id'],))
+    players = dbcur.fetchall()
     return render_template('collection/index.html', games=games, players=players)
 
 
@@ -41,13 +44,15 @@ def addgame():
                 game_id = results[0][0]
                 game_info = get_game_info(game_id)
                 db = get_db()
-                game_exists = db.execute("Select id from games where id = ?", (game_id,)).fetchone()
+                dbcur = db.cursor()
+                dbcur.execute("Select id from games where id = %s;", (game_id,))
+                game_exists = dbcur.fetchone()
                 if not game_exists:
-                    db.execute('INSERT INTO games (id, name, minplay, maxplay) VALUES (?, ?, ?, ?)', game_info)
+                    dbcur.execute('INSERT INTO games (id, name, minplay, maxplay) VALUES (%s, %s, %s, %s);', game_info)
                     db.commit()
 
-                db.execute('INSERT INTO collection (user_id, game_id, favorite) VALUES (?, ?, ?)',
-                           (session['user_id'], game_id, favorite))
+                dbcur.execute('INSERT INTO collection (user_id, game_id, favorite) VALUES (%s, %s, %s);',
+                              (session['user_id'], game_id, favorite))
                 db.commit()
                 flash("Added Successfully")
                 return redirect(url_for('index'))
@@ -71,14 +76,15 @@ def pickgame():
 
         if error is None:
             db = get_db()
-            options = db.execute(
-                "Select id, Name from games where ? between minplay and maxplay", (numplayers,)
-            ).fetchall()
+            dbcur = db.cursor()
+            dbcur.execute(
+                "Select id, Name from games where %s between minplay and maxplay;", (numplayers,))
+            options = dbcur.fetchall()
             if not options:
                 error = 'No games support that number of players. Try again'
                 flash(error)
                 return render_template('collection/pickgame.html')
-            picked_game = random.randint(0, len(options) -1)
+            picked_game = random.randint(0, len(options) - 1)
             return render_template('collection/gameresult.html',
                                    game=options[picked_game][1])
 
@@ -99,13 +105,15 @@ def pickplayer():
 
         if error is None:
             db = get_db()
+            dbcur = db.cursor()
             playerlist = playertext.split()
             for player in playerlist:
-                player_id = db.execute('SELECT id from players WHERE user_id = ? and upper(name) = upper(?)',
-                                       (session['user_id'], player)).fetchone()
+                dbcur.execute('SELECT id from players WHERE user_id = %s and upper(name) = upper(%s);',
+                                          (session['user_id'], player))
+                player_id = dbcur.fetchone()
                 if not player_id:
-                    db.execute('INSERT INTO players (user_id, name) VALUES (?, ?)',
-                               (session['user_id'], player))
+                    dbcur.execute('INSERT INTO players (user_id, name) VALUES (%s, %s);',
+                                  (session['user_id'], player))
                     db.commit()
             pickagainlist = "_".join(playerlist)
             return render_template('collection/firstplayer.html',
@@ -115,11 +123,14 @@ def pickplayer():
 
     return render_template('collection/pickplayer.html')
 
+
 @bp.route('/togglefavorite/<id>', methods=['GET'])
 @login_required
 def togglefavorite(id):
     db = get_db()
-    db.execute("UPDATE collection set favorite = ((favorite | 1) - (favorite & 1)) where user_id = ? and game_id = ?",
-               (session['user_id'], id))
+    dbcur = db.cursor()
+    dbcur.execute(
+        "UPDATE collection set favorite = ((favorite | 1) - (favorite & 1)) where user_id = %s and game_id = %s;",
+        (session['user_id'], id))
     db.commit()
     return redirect(url_for('index'))

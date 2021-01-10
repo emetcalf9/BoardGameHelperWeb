@@ -14,11 +14,11 @@
     <h1>Your Games</h1>
   {% for game in games %}
     <article class="game">
-      <p>{{ game['name'] }}</p>
+      <p>{{ game[1] }}</p>
       <ul>
-        <li>Minimum Players: {{ game['minplay'] }}</li>
-        <li>Maximum Players: {{ game['maxplay'] }}</li>
-        <li>Favorite?: <a class="action" href="{{ url_for('collection.togglefavorite', id=game['id']) }}">{{game['favorite']}}</a> </li>
+        <li>Minimum Players: {{ game[2] }}</li>
+        <li>Maximum Players: {{ game[3] }}</li>
+        <li>Favorite?: <a class="action" href="{{ url_for('collection.togglefavorite', id=game['id']) }}">{{game[4]}}</a> </li>
       </ul>
     </article>
     {% if not loop.last %}
@@ -30,7 +30,7 @@
 <h1>People you play with</h1>
   {% for player in players %}
     <article class="player">
-      <p>{{ player['name'] }}</
+      <p>{{ player[0] }}</p>
     </article>
     {% if not loop.last %}
       <hr>
