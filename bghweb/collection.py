@@ -51,10 +51,16 @@ def addgame():
                     dbcur.execute('INSERT INTO games (id, name, minplay, maxplay) VALUES (%s, %s, %s, %s);', game_info)
                     db.commit()
 
-                dbcur.execute('INSERT INTO collection (user_id, game_id, favorite) VALUES (%s, %s, %s);',
+                dbcur.execute("Select id from collection where game_id = %s and user_id = %s;",
+                              (game_id, session['user_id']))
+                already_owned = dbcur.fetchone()
+                if not already_owned:
+                    dbcur.execute('INSERT INTO collection (user_id, game_id, favorite) VALUES (%s, %s, %s);',
                               (session['user_id'], game_id, favorite))
-                db.commit()
-                flash("Added Successfully")
+                    db.commit()
+                    flash("Added Successfully")
+                else:
+                    flash("You already own that game")
                 return redirect(url_for('collection.addgame'))
             else:
                 return render_template('collection/searchresults.html', game_list=results)
