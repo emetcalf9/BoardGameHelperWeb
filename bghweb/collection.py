@@ -55,7 +55,7 @@ def addgame():
                               (session['user_id'], game_id, favorite))
                 db.commit()
                 flash("Added Successfully")
-                return redirect(url_for('index'))
+                return redirect(url_for('collection.addgame'))
             else:
                 return render_template('collection/searchresults.html', game_list=results)
 
