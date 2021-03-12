@@ -84,7 +84,11 @@ def pickgame():
             db = get_db()
             dbcur = db.cursor()
             dbcur.execute(
-                "Select id, Name from games where %s between minplay and maxplay;", (numplayers,))
+                '''Select g.id, g.Name 
+                from games g 
+                inner join collection c on g.id = c.game_id 
+                where %s between minplay and maxplay
+                and c.user_id = %s;''', (numplayers, session['user_id']))
             options = dbcur.fetchall()
             if not options:
                 error = 'No games support that number of players. Try again'
